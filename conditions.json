@@ -10,5 +10,7 @@
     "floor area": "",
     "structure": "",
     "depressurization": true,
-    "pressurization": true
+    "pressurization": true,
+    "fan_count": 2,
+    "fan_cover": "none"
 }

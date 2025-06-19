@@ -32,15 +32,21 @@ class BlowerDoorTestCalculator:
         # 계산 결과 저장을 위한 변수
         self.val = dict()
         # PWM duty to Volumetric Flow rate calculation
-        # OF-OD172SAP-Reversible Fan에만 해당하는 값임
-        # Fan의 개수
-        self.num_fans = 2
+        # Fan coefficients are loaded from fan_coefficients.json
+        with open('fan_coefficients.json', 'r') as f:
+            coeffs = json.load(f)
+
+        cover = measured_data.get("fan_cover", "none")
+        fan_coeff = coeffs.get(cover, coeffs["none"])
+
+        # Fan count
+        self.num_fans = int(measured_data.get("fan_count", 2))
         # for Forward flow
-        self.slope_fwd = -14.76092
-        self.intercept_fwd = 677.2736
+        self.slope_fwd = fan_coeff["forward"]["slope"]
+        self.intercept_fwd = fan_coeff["forward"]["intercept"]
         # for Reverse flow
-        self.slope_rev = 10.48651
-        self.intercept_rev = -578.7256
+        self.slope_rev = fan_coeff["reverse"]["slope"]
+        self.intercept_rev = fan_coeff["reverse"]["intercept"]
         # 풍량 측정 값 저장
         self.measured_values = [[i, (self.slope_fwd * j + self.intercept_fwd) * self.num_fans] 
                                 if j < 50 else 
