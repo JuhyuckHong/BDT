@@ -9,9 +9,9 @@ import json
 import time
 import shutil
 from datetime import datetime
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QVBoxLayout
-from PyQt5.QtWidgets import QPushButton, QGridLayout, QCheckBox, QMainWindow, QMessageBox
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QVBoxLayout,
+                             QPushButton, QGridLayout, QCheckBox, QMainWindow,
+                             QMessageBox, QComboBox, QTableWidget, QTableWidgetItem)
 from PyQt5.QtCore import QTimer, QPointF, Qt, QThread, pyqtSignal, QCoreApplication
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
 from PyQt5.QtGui import QFont, QFontDatabase, QPixmap
@@ -93,6 +93,24 @@ class InputInitalValues(QWidget):
             # 데이터 저장
             self.input_fields[label_key] = input_field
 
+        next_row = row + 1
+
+        # 팬 설정 드롭다운
+        fan_count_label = QLabel("팬 개수")
+        self.fan_count_cb = QComboBox()
+        self.fan_count_cb.addItems(["1", "2"])
+        self.fan_count_cb.setCurrentText("2")
+        layout.addWidget(fan_count_label, next_row, 0)
+        layout.addWidget(self.fan_count_cb, next_row, 1)
+        next_row += 1
+
+        fan_cover_label = QLabel("팬 커버")
+        self.fan_cover_cb = QComboBox()
+        self.fan_cover_cb.addItems(["none", "low", "high"])
+        layout.addWidget(fan_cover_label, next_row, 0)
+        layout.addWidget(self.fan_cover_cb, next_row, 1)
+        next_row += 1
+
         # 체크박스 데이터
         self.checkbox_states = {}
 
@@ -100,17 +118,17 @@ class InputInitalValues(QWidget):
         checkbox1 = QCheckBox("감압 실험")
         checkbox1.setObjectName("depressurization")
         checkbox1.stateChanged.connect(self.save_checkbox_state)
-        layout.addWidget(checkbox1, row + 1, 0)
+        layout.addWidget(checkbox1, next_row, 0)
 
         checkbox2 = QCheckBox("가압 실험")
         checkbox2.setObjectName("pressurization")
         checkbox2.stateChanged.connect(self.save_checkbox_state)
-        layout.addWidget(checkbox2, row + 2, 0)
+        layout.addWidget(checkbox2, next_row + 1, 0)
 
         # 저장 버튼 생성
         save_button = QPushButton("Save")
         save_button.clicked.connect(self.save_data)
-        layout.addWidget(save_button, row + 2, 1)
+        layout.addWidget(save_button, next_row + 1, 1)
 
     def save_checkbox_state(self):
         sender = self.sender()
@@ -138,6 +156,9 @@ class InputInitalValues(QWidget):
         for key, input_field in self.input_fields.items():
             value = input_field.text()
             data[key] = value
+        # 팬 선택 및 커버 정보 저장
+        data["fan_count"] = int(self.fan_count_cb.currentText())
+        data["fan_cover"] = self.fan_cover_cb.currentText()
         # 체크박스 데이터 저장
         for key, checkbox in self.checkbox_states.items():
             data[key] = checkbox

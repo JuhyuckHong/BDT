@@ -99,16 +99,29 @@ def duty_set(duty, test=True):
     return 0
 
 
-def fan_power(set=1):
-    # Connect to pigpio
-    pi = pigpio.pi()
-    
-    # Define the GPIO pin for power relay for the Fan
-    gpio_pin = 23
-    # To set the relay
-    pi.write(gpio_pin, set)
+def fan_power(set=1, fan_number=1):
+    """Control power for individual fans.
 
-    # Disconnect from pigpio
+    Parameters
+    ----------
+    set : int
+        1 to turn on, 0 to turn off.
+    fan_number : int or str
+        1 or 2 to control a specific fan, "both" to control both.
+    """
+
+    pi = pigpio.pi()
+
+    gpio_pins = {1: 23, 2: 24}
+
+    if fan_number == "both":
+        targets = gpio_pins.values()
+    else:
+        targets = [gpio_pins.get(fan_number, 23)]
+
+    for pin in targets:
+        pi.write(pin, set)
+
     pi.stop()
     return 0
 
