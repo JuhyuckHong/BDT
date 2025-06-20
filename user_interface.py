@@ -387,16 +387,10 @@ class BackgroundTask(QThread):
     def blower_door_test(self, test):
 
         # 측정 모드에 따른 변수 설정
-        # OF-OD172SAP-Reversible 팬에만 해당하는 값임
-        zero_duty = 50
-        if test == "pressurization":
-            # PWM 55~90
-            min_duty, max_duty = 55, 90
-            initial_duty = 58
-        elif test == "depressurization":
-            # PWM 10~45
-            min_duty, max_duty = 45, 10
-            initial_duty = 42
+        # 사용중인 팬의 설정값
+        stop_duty = 0
+        min_duty, max_duty = 20, 100
+        initial_duty = min_duty
 
         # 측정
         measuring = {}
@@ -412,6 +406,9 @@ class BackgroundTask(QThread):
 
         # 시작 0 기류 압력 측정 # 현재 버전에서는 생략
         # measuring["initial_zero_pressure"] = self.measuring_pressure(10, 1)
+
+        # 시험 시작 전 PWM duty를 0으로 설정
+        sensor_and_controller.duty_set(stop_duty, test=test_mode)
 
         # 시험 시작
         success = False
@@ -453,7 +450,7 @@ class BackgroundTask(QThread):
         # 종료 0 기류 압력 측정 # 현재 버전에서는 생략
         # measuring["final_zero_pressure"] = self.measuring_pressure(10, 1)
         # 시험 종료
-        sensor_and_controller.duty_set(zero_duty, test=test_mode)
+        sensor_and_controller.duty_set(stop_duty, test=test_mode)
         # 시험 종료 시간 기록
         time_end = datetime.now().strftime("%H:%M:%S")
         measuring["test time"] = [time_start, time_end]
@@ -619,7 +616,7 @@ class BackgroundTask(QThread):
 
 
 if __name__ == '__main__':
-    sensor_and_controller.duty_set(50, False)
+    sensor_and_controller.duty_set(0, False)
     app = QApplication(sys.argv)
 
     # 창 사이즈 설정
