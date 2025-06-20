@@ -1,6 +1,8 @@
 import json
 import math
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.patches as patches
@@ -421,10 +423,11 @@ def plot_graph(resultsd, resultsp, report):
                     yd_closeup_end + (yd_closeup_end - Q50d)*0.1)
 
         # 확대 플롯 틱
-        axd.set_xticks([Pa_50], [""])
-        axd.set_yticks([yd_closeup_start, 
-                    yd_closeup_end], 
-                    [f'{yd_closeup_start:.0f}',
+        axd.set_xticks([Pa_50])
+        axd.set_xticklabels([""])
+        axd.set_yticks([yd_closeup_start,
+                    yd_closeup_end])
+        axd.set_yticklabels([f'{yd_closeup_start:.0f}',
                     f'{yd_closeup_end:.0f}'])
 
         # 확대 플롯 그리기
@@ -503,10 +506,11 @@ def plot_graph(resultsd, resultsp, report):
                     yp_closeup_end + (yp_closeup_end - Q50p)*0.1)
 
         # 확대 플롯 틱
-        axp.set_xticks([Pa_50], [""])
-        axp.set_yticks([yp_closeup_start, 
-                    yp_closeup_end], 
-                    [f'{yp_closeup_start:.0f}',
+        axp.set_xticks([Pa_50])
+        axp.set_xticklabels([""])
+        axp.set_yticks([yp_closeup_start,
+                    yp_closeup_end])
+        axp.set_yticklabels([f'{yp_closeup_start:.0f}',
                     f'{yp_closeup_end:.0f}'])
 
         # 확대 플롯 그리기
