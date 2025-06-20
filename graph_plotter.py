@@ -95,12 +95,28 @@ def plot_graph(resultsd, resultsp, report):
     plt.xlim(x_lim_min, x_lim_max)
 
     # y 축 설정
+    # 측정된 풍량 값에 따라 축 범위를 동적으로 계산한다.
+    y_values = []
+    if resultsd:
+        _, yd_values_all = zip(*resultsd["measured values"])
+        y_values.extend(yd_values_all)
+    if resultsp:
+        _, yp_values_all = zip(*resultsp["measured values"])
+        y_values.extend(yp_values_all)
+
+    if y_values:
+        y_min = min(y_values)
+        y_max = max(y_values)
+        y_lim_min = 10 ** math.floor(math.log10(y_min))
+        y_lim_max = 10 ** math.ceil(math.log10(y_max))
+    else:
+        y_lim_min = 100
+        y_lim_max = 1000
+
+    ticks = np.logspace(math.log10(y_lim_min), math.log10(y_lim_max), num=10)
     plt.yscale("log")
-    plt.yticks([100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
-               [100, 200, 300, 400, 500, 600, 700, 800, 900, '1,000'])
+    plt.yticks(ticks, [f'{t:,.0f}' for t in ticks])
     plt.tick_params(axis='y', direction='in')
-    y_lim_min = 100
-    y_lim_max = 1000
     plt.ylim(y_lim_min, y_lim_max)
 
     equation = r'$Q={C:.2f} \cdot \Delta P^{{{n:.2f}}}$'
