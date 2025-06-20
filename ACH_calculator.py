@@ -48,10 +48,20 @@ class BlowerDoorTestCalculator:
         self.slope_rev = fan_coeff["reverse"]["slope"]
         self.intercept_rev = fan_coeff["reverse"]["intercept"]
         # 풍량 측정 값 저장
-        self.measured_values = [[i, (self.slope_fwd * j + self.intercept_fwd) * self.num_fans] 
-                                if j < 50 else 
-                                [i, (self.slope_rev * j + self.intercept_rev) * self.num_fans]
-                                for i, j in measured_data["measured_value"]]
+        self.measured_values = []
+        for dp, duty in measured_data["measured_value"]:
+            # pressure 값이 음수면 절댓값 처리
+            pressure = abs(dp)
+            # pressure 값이 0이면 0.01로 변환
+            if pressure == 0:
+                pressure = 0.01
+
+            if duty < 50:
+                flow = (self.slope_fwd * duty + self.intercept_fwd) * self.num_fans
+            else:
+                flow = (self.slope_rev * duty + self.intercept_rev) * self.num_fans
+
+            self.measured_values.append([pressure, flow])
 
 
     @classmethod
