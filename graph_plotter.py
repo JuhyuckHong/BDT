@@ -107,15 +107,27 @@ def plot_graph(resultsd, resultsp, report):
     if y_values:
         y_min = min(y_values)
         y_max = max(y_values)
-        y_lim_min = 10 ** math.floor(math.log10(y_min))
-        y_lim_max = 10 ** math.ceil(math.log10(y_max))
+        # 기본 범위를 데이터보다 약간 넓게 설정한다
+        y_lim_min = (math.floor(y_min / 100) - 1) * 100
+        y_lim_max = (math.ceil(y_max / 100) + 1) * 100
+        y_lim_min = max(y_lim_min, 10)
     else:
         y_lim_min = 100
         y_lim_max = 1000
 
     ticks = np.logspace(math.log10(y_lim_min), math.log10(y_lim_max), num=10)
+    labels = []
+    for t in ticks:
+        if t >= 100:
+            lab = round(t / 100) * 100
+        elif t >= 10:
+            lab = round(t / 10) * 10
+        else:
+            lab = round(t)
+        labels.append(f'{lab:,.0f}')
+
     plt.yscale("log")
-    plt.yticks(ticks, [f'{t:,.0f}' for t in ticks])
+    plt.yticks(ticks, labels)
     plt.tick_params(axis='y', direction='in')
     plt.ylim(y_lim_min, y_lim_max)
 
