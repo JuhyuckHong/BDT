@@ -123,6 +123,9 @@ class InputInitalValues(QWidget):
 
         self.fan_count_cb.currentIndexChanged.connect(self.update_fan_cover_visibility)
 
+        # 초기 팬 개수 설정에 맞춰 두 번째 팬 커버 가시성 업데이트
+        self.update_fan_cover_visibility()
+
         # 체크박스 데이터
         self.checkbox_states = {}
 
