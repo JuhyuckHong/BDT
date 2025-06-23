@@ -104,12 +104,24 @@ class InputInitalValues(QWidget):
         layout.addWidget(self.fan_count_cb, next_row, 1)
         next_row += 1
 
-        fan_cover_label = QLabel("팬 커버")
-        self.fan_cover_cb = QComboBox()
-        self.fan_cover_cb.addItems(["none", "low", "high"])
-        layout.addWidget(fan_cover_label, next_row, 0)
-        layout.addWidget(self.fan_cover_cb, next_row, 1)
+        fan_cover1_label = QLabel("팬1 커버")
+        self.fan_cover1_cb = QComboBox()
+        self.fan_cover1_cb.addItems(["none", "low", "high"])
+        layout.addWidget(fan_cover1_label, next_row, 0)
+        layout.addWidget(self.fan_cover1_cb, next_row, 1)
         next_row += 1
+
+        fan_cover2_label = QLabel("팬2 커버")
+        self.fan_cover2_cb = QComboBox()
+        self.fan_cover2_cb.addItems(["none", "low", "high"])
+        layout.addWidget(fan_cover2_label, next_row, 0)
+        layout.addWidget(self.fan_cover2_cb, next_row, 1)
+        self.fan_cover2_label = fan_cover2_label
+        self.fan_cover2_cb.hide()
+        self.fan_cover2_label.hide()
+        next_row += 1
+
+        self.fan_count_cb.currentIndexChanged.connect(self.update_fan_cover_visibility)
 
         # 체크박스 데이터
         self.checkbox_states = {}
@@ -137,6 +149,15 @@ class InputInitalValues(QWidget):
 
         self.checkbox_states[checkbox_text] = checkbox_state
 
+    def update_fan_cover_visibility(self):
+        """Show or hide second fan cover option based on fan count."""
+        if int(self.fan_count_cb.currentText()) >= 2:
+            self.fan_cover2_cb.show()
+            self.fan_cover2_label.show()
+        else:
+            self.fan_cover2_cb.hide()
+            self.fan_cover2_label.hide()
+
     def save_data(self):
         # 필수 값인 'interior volume' 값이 비어있는지 확인
         interior_volume = self.input_fields["interior volume"].text()
@@ -158,7 +179,9 @@ class InputInitalValues(QWidget):
             data[key] = value
         # 팬 선택 및 커버 정보 저장
         data["fan_count"] = int(self.fan_count_cb.currentText())
-        data["fan_cover"] = self.fan_cover_cb.currentText()
+        data["fan_cover1"] = self.fan_cover1_cb.currentText()
+        if data["fan_count"] >= 2:
+            data["fan_cover2"] = self.fan_cover2_cb.currentText()
         # 체크박스 데이터 저장
         for key, checkbox in self.checkbox_states.items():
             data[key] = checkbox

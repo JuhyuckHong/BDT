@@ -12,5 +12,6 @@
     "depressurization": true,
     "pressurization": true,
     "fan_count": 2,
-    "fan_cover": "none"
+    "fan_cover1": "none",
+    "fan_cover2": "none"
 }
