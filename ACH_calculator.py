@@ -36,30 +36,31 @@ class BlowerDoorTestCalculator:
         with open('fan_coefficients.json', 'r') as f:
             coeffs = json.load(f)
 
-        cover = measured_data.get("fan_cover", "none")
-        fan_coeff = coeffs.get(cover, coeffs["none"])
+        covers = []
+        if "fan_cover1" in measured_data:
+            covers.append(measured_data.get("fan_cover1", "none"))
+            if int(measured_data.get("fan_count", 1)) >= 2:
+                covers.append(measured_data.get("fan_cover2", "none"))
+        else:
+            covers.append(measured_data.get("fan_cover", "none"))
 
-        # Fan count
-        self.num_fans = int(measured_data.get("fan_count", 2))
-        # for Forward flow
-        self.slope_fwd = fan_coeff["forward"]["slope"]
-        self.intercept_fwd = fan_coeff["forward"]["intercept"]
-        # for Reverse flow
-        self.slope_rev = fan_coeff["reverse"]["slope"]
-        self.intercept_rev = fan_coeff["reverse"]["intercept"]
+        fan_coeffs = [coeffs.get(c, coeffs["none"]) for c in covers]
+
+        self.num_fans = len(fan_coeffs)
+        self.fan_coeffs = fan_coeffs
         # 풍량 측정 값 저장
         self.measured_values = []
         for dp, duty in measured_data["measured_value"]:
-            # pressure 값이 음수면 절댓값 처리
             pressure = abs(dp)
-            # pressure 값이 0이면 0.01로 변환
             if pressure == 0:
                 pressure = 0.01
 
-            if duty < 50:
-                flow = (self.slope_fwd * duty + self.intercept_fwd) * self.num_fans
-            else:
-                flow = (self.slope_rev * duty + self.intercept_rev) * self.num_fans
+            flow = 0
+            for coeff in self.fan_coeffs:
+                # The fan is unidirectional so forward/reverse coefficients are
+                # identical. Use a single set of coefficients regardless of the
+                # duty cycle.
+                flow += coeff["forward"]["slope"] * duty + coeff["forward"]["intercept"]
 
             self.measured_values.append([pressure, flow])
 
