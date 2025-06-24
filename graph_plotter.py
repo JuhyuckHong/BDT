@@ -59,9 +59,8 @@ def plot_graph(resultsd, resultsp, report):
     dpi = 300  # 인치당 픽셀 (dots per inch)
     plt.figure(figsize=(width_px/dpi, height_px/dpi))
     
-    # ACH50 표시
-    position = {"x": 10.5,
-                "y": 110}
+
+    # ACH50 표시 문자열 준비
     text = {"s": f'[ACH50]'}
     if resultsd and resultsp:
         text["s"] += f'\n평균: {report["ACH50_avg"]:.2f}'
@@ -74,18 +73,6 @@ def plot_graph(resultsd, resultsp, report):
     elif resultsp:
         text["s"] += f'\n가압: {report["ACH50+"]:.2f}'
         text["s"] += f'\n체적: {report["interior_volume+"]:.1f}㎥'
-    
-    plt.text(**position,
-             **text, 
-             fontproperties=font10, 
-             ha='left',
-             bbox=dict(facecolor='white',
-                       edgecolor='grey',
-                       boxstyle='round',
-                       pad=0.25,
-                       alpha=0.5,
-                       linewidth=1,
-                       linestyle='--'))
 
     # x 축 설정
     plt.xscale("log")
@@ -132,6 +119,27 @@ def plot_graph(resultsd, resultsp, report):
     plt.yticks(ticks, labels)
     plt.tick_params(axis='y', direction='in')
     plt.ylim(y_lim_min, y_lim_max)
+
+    # ACH50 텍스트 위치를 y축 범위에 맞게 조정한다
+    position = {
+        "x": 10.5,
+        "y": y_lim_min + (y_lim_max - y_lim_min) / 9
+    }
+    plt.text(
+        **position,
+        **text,
+        fontproperties=font10,
+        ha='left',
+        bbox=dict(
+            facecolor='white',
+            edgecolor='grey',
+            boxstyle='round',
+            pad=0.25,
+            alpha=0.5,
+            linewidth=1,
+            linestyle='--'
+        )
+    )
 
     equation = r'$Q={C:.2f} \cdot \Delta P^{{{n:.2f}}}$'
     # 그래프 그리기 옵션들
