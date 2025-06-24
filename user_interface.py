@@ -448,9 +448,18 @@ class BackgroundTask(QThread):
                                                              test=test_mode)
         print(f"max duty: {duty}, control: {success}, pressure at duty: {pressure}")
 
-        # 70Pa PWM duty 값 추출 실패 시 = 누기량/침기량 대비 압력형성을 위한 풍량 부족
-        # max duty부터 min duty 전 까지 10번 수행
+        # 70Pa PWM duty 값 추출 실패 시
+        # 풍량 부족과 과다의 경우를 분리하여 처리
         if not success:
+            # 풍량 과다로 목표 압력보다 큰 값이 측정된 경우
+            if pressure > 100:
+                QMessageBox.warning(None,
+                                    "풍량 과다",
+                                    "풍량이 과다합니다. 팬 커버를 사용하거나 한 대의 팬만으로 시험을 진행해 주세요.")
+                sensor_and_controller.duty_set(initial_duty, test=test_mode)
+                return
+
+            # 그 외의 경우는 풍량 부족으로 간주하여 최대 duty로 측정
             duty = max_duty
             success = True
 
